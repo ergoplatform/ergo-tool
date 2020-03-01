@@ -60,13 +60,13 @@ https://gist.github.com/greenhat/47fc2a4190ba8874248a3f759f645f1b
 
 ## Sell Tokens
 
-If we have tokens in a box we can sell them. Well, at least we can create an Ask order
-and submit it to the order book. In our DEX implementation we create orders and store
-them directly on the Ergo blockchain. The created order in our case is a box (seller box)
-protected with the special _seller contract_ holding the necessary amount of ERGs (`ergAmount`) and the token. 
+If we have tokens in a box we can sell them. Well, at least we can create an Ask order and submit it
+to the order book. In our DEX implementation we create orders and store them directly on the Ergo
+blockchain. The created order in our case is a box (seller box) protected with the special _seller
+contract_ holding the minimum amount of ERGs (`minErg`) and `tokenAmount` of the `TID` tokens.
 
 ```
-// Seller Contract
+// Seller contract
 // pkB: SigmaProp - public key of the seller (Bob)
 {
   pkB || {
@@ -83,7 +83,7 @@ The seller contract guarantees that the seller box can be spent:
 2) by a _swap transaction_ created by Matcher in which _seller box_ is spent together (i.e.
 atomically) with the matched _buyer box_ (see [buy tokens](#buy-tokens)).
 
-The following command can be used to create new _ask order_ to sell tokens:
+The following command can be used to create a new _ask order_ to sell tokens:
 ```
 Command Name:	dex:SellOrder
 Usage Syntax:	ergo-tool dex:SellOrder <wallet file> <ergPrice> <tokenId> <tokenAmount> <dexFee>
@@ -92,15 +92,16 @@ Description:	put a token seller order with given <tokenId> and <tokenAmount> for
 Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/dex/CreateSellOrderCmd.html
 ```
 
-Here is an example of using `dex:SellOrder` to submit the order to the blockchain - https://gist.github.com/greenhat/9536a7c13106f6a99530720504a6031a
+Here is an [example](https://gist.github.com/greenhat/9536a7c13106f6a99530720504a6031a) of using
+`dex:SellOrder` to submit the order to the blockchain.
   
 ## Buy Tokens
 
-You may also want to buy tokens, either because you believe it's value is going to surge
-or you need one to participate in a dApp which require having some tokens or whatever
-reason you may have. You can create a Bid order and submit it to the order book. The created
-order is a box (buyer box) protected with the special _buyer contract_ holding the necessary 
-amount of ERGs and specifying `tokenId` and `tokenAmount` you want to buy.
+You may also want to buy tokens, either because you believe it's value is going to surge or you need
+one to participate in a dApp which require having some tokens or whatever reason you may have. You
+can create a Bid order and submit it to the order book. The created order is a box (buyer box)
+protected with the special _buyer contract_ holding the necessary amount of ERGs and checking in the
+contract the swap conditions (given `tokenId` and `tokenAmount` you want to buy).
 
 ```
 // Buyer contract
@@ -122,24 +123,28 @@ amount of ERGs and specifying `tokenId` and `tokenAmount` you want to buy.
 ```  
 
 The buyer contract guarantees that the buyer box can be spent:
-1) by buyer itself, which is the way for buyer to [cancel the order](#canceling-the-orders)
-2) by a _swap transaction_ created by Matcher in which _buyer box_ is spent together (i.e atomically) 
+1) by the buyer itself, which is the way for the buyer to [cancel the order](#canceling-the-orders)
+2) by a _swap transaction_ created by Matcher in which the _buyer box_ is spent together (i.e atomically) 
 with the matched _seller box_ (see [sell tokens](#sell-tokens)).
 
-The following command can be used to create new _buy order_ to buy tokens:
+The following command can be used to create a new _buy order_ to buy tokens:
 ```
 Command Name:	dex:BuyOrder
 Usage Syntax:	ergo-tool dex:BuyOrder <wallet file> <ergAmount> <tokenId> <tokenAmount>, <dexFee>
-Description:	put a token buyer order with given <tokenId> and <tokenAmount> to buy at given <ergPrice> price with <dexFee> as a reward for anyone who matches this order with a seller, with wallet's address to be used for withdrawal
- with the given <wallet file> to sign transaction (requests storage password)
+Description:	put a token buyer order with given <tokenId> and <tokenAmount> to buy at given
+<ergPrice> price with <dexFee> as a reward for anyone who matches this order with a seller, with
+wallet's address to be used for withdrawal with the given <wallet file> to sign transaction
+(requests storage password)
 Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/dex/CreateBuyOrderCmd.html
 ```
 
-Here is an example of using `dex:BuyOrder` to submit the order to the blockchain - https://gist.github.com/greenhat/0c75738edadb9870a2cfb492d6069a57
+Here is an [example](https://gist.github.com/greenhat/0c75738edadb9870a2cfb492d6069a57) of using
+`dex:BuyOrder` to submit the order to the blockchain.
 
 ## List My Orders 
 
-To show your outstanding buy/sell orders (that use your public key in their contracts) use `dex:ListMyOrders` command:
+To show your outstanding buy/sell orders (that use your public key in their contracts) use
+`dex:ListMyOrders` command:
 ```
 Command Name:	dex:ListMyOrders
 Usage Syntax:	ergo-tool dex:ListMyOrders <storageFile>
@@ -147,12 +152,13 @@ Description:	show buy and sell orders created from the address of this wallet
 Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/dex/ListMyOrdersCmd.html
 ```
 
-Here is an example of using `dex:ListMyOrders` - https://gist.github.com/greenhat/6b1b2f7be1279de49e33045b3fac6f81
+Here is an [example](https://gist.github.com/greenhat/6b1b2f7be1279de49e33045b3fac6f81) of using
+`dex:ListMyOrders`.
 
 ## Cancel Order
 
-To cancel your buy/sell order you need to "spend" the box of the order by sending its assets (coins and/or tokens)
-to your own address.
+To cancel your buy/sell order you need to "spend" the box of the order by sending its assets (coins
+and/or tokens) back to your own address.
 The following command can be used to spend your order box and send you the assets:
 ```
 Command Name:	dex:CancelOrder
@@ -161,11 +167,14 @@ Description:	claim an unspent buy/sell order (by <orderBoxId>) and sends the ERG
 Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/dex/CancelOrderCmd.html
 ```
 
-Here is an example of using `dex:CancelOrder` - https://gist.github.com/greenhat/6c70999c763a70a7253170d33127e9da
+Here is an [example](https://gist.github.com/greenhat/6c70999c763a70a7253170d33127e9da) of using
+`dex:CancelOrder`.
 
 ## Overview
 
-To get an overview of how contracts and boxes play in transactions check out an Ergo playground with scenarios for the DEX commands - [Run in Scastie](https://scastie.scala-lang.org/greenhat/T2jSEv11QcWpXX1XrcHUdw/49)
+To get an overview of how contracts and boxes play in transactions check out an Ergo playground with
+scenarios for the DEX commands - [Run in
+Scastie](https://scastie.scala-lang.org/greenhat/T2jSEv11QcWpXX1XrcHUdw/49)
 
 ## To recap
 
@@ -175,7 +184,7 @@ directly on Ergo blockchain, it mostly motivated by three goals we keep in mind:
 least using CLI, in the absence of better UI)
 2) our implementation should be simple and easy to use as an example of application
 development on top of Ergo and as an inspiration for other useful dApps.
-3) the commands should be available as the library of reusable components which can be
+3) the commands are available as the library of reusable components which can be
 used by developers to design and implement a much better UI for Ergo DEX.
 
 In the next posts we are going look under the hood and see how to implement new commands of
