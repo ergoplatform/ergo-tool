@@ -171,12 +171,6 @@ Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/er
 Here is an [example](https://gist.github.com/greenhat/6c70999c763a70a7253170d33127e9da) of using
 `dex:CancelOrder`.
 
-## Overview
-
-To get an overview of how contracts and boxes play in transactions check out an Ergo playground with
-scenarios for the DEX commands - [Run in
-Scastie](https://scastie.scala-lang.org/greenhat/T2jSEv11QcWpXX1XrcHUdw/49)
-
 ## To recap
 
 ErgoTool DEX is simple implementation of trustless decentralized exchange of crypto assets
