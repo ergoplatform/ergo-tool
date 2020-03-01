@@ -135,7 +135,6 @@ contract the swap conditions (given `tokenId` and `tokenAmount` you want to buy)
           tokens(0)._2 >= tokenAmount
 
         val knownId = OUTPUTS(0).R4[Coll[Byte]].get == SELF.id
-        // TODO fix Coll.fromItems crashing Inox typer and rewrite with allOf(Coll.fromItems[Boolean](
         tokenDataCorrect &&
         OUTPUTS(0).propositionBytes == pkA.propBytes &&
         knownId
