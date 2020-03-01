@@ -31,6 +31,8 @@ orders can create the swap transaction and get a reward in ERGs.
 In this post we describe a simple yet functional implementation of DEX protocol
 within ErgoTool - a command line interface (CLI) utility for Ergo.  
 
+![DEX](DEXDiagram.png)
+
 ## Issue A New Token
 
 The first operation in the lifecycle of a new token is its issue.
