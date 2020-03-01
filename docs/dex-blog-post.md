@@ -147,6 +147,8 @@ Description:	show buy and sell orders created from the address of this wallet
 Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/dex/ListMyOrdersCmd.html
 ```
 
+Here is an example of using `dex:ListMyOrders` - https://gist.github.com/greenhat/6b1b2f7be1279de49e33045b3fac6f81
+
 ## Cancel Order
 
 To cancel your buy/sell order you need to "spend" the box of the order by sending its assets (coins and/or tokens)
@@ -158,6 +160,8 @@ Usage Syntax:	ergo-tool dex:CancelOrder <wallet file> <orderBoxId>
 Description:	claim an unspent buy/sell order (by <orderBoxId>) and sends the ERGs/tokens to the address of this wallet (requests storage password)
 Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/dex/CancelOrderCmd.html
 ```
+
+Here is an example of using `dex:CancelOrder` - https://gist.github.com/greenhat/6c70999c763a70a7253170d33127e9da
 
 ## Overview
 
