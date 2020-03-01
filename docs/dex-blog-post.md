@@ -67,19 +67,26 @@ to the order book. In our DEX implementation we create orders and store them dir
 blockchain. The created order in our case is a box (seller box) protected with the special _seller
 contract_ holding the minimum amount of ERGs (`minErg`) and `tokenAmount` of the `TID` tokens.
 
-```
-// Seller contract
-// pkB: SigmaProp - public key of the seller (Bob)
-// ergAmount - nanoERG amount you want to receive for you tokens
-{
-  pkB || {
-    val knownBoxId = OUTPUTS(1).R4[Coll[Byte]].get == SELF.id
-    OUTPUTS(1).value >= ergAmount &&
+```scala
+  /** Seller's contract for DEX
+    * @param ergAmount nanoERG amount seller wants to receive for the tokens
+    * @param pkB public key of the seller
+    * @return compiled contract
+    */
+  def seller(ctx: Context, ergAmount: Long, pkB: SigmaProp): SigmaProp = {
+    import ctx._
+    pkB || (
+      OUTPUTS.size > 1 &&
+      OUTPUTS(1).R4[Coll[Byte]].isDefined
+    ) && {
+      val knownBoxId = OUTPUTS(1).R4[Coll[Byte]].get == SELF.id
+      OUTPUTS(1).value >= ergAmount &&
       knownBoxId &&
       OUTPUTS(1).propositionBytes == pkB.propBytes
+    }
   }
-}
 ```
+from [certified contract repository](http://github.com/ergoplatform/ergo-contracts/blob/391912fbd466c1b262e8d2fa61d4bfd94981df4a/verified-contracts/src/main/scala/org/ergoplatform/contracts/AssetsAtomicExchange.scala#L41-L58)
 
 The seller contract guarantees that the seller box can be spent: 
 1) by seller itself, which is the way for a seller to [cancel the order](#canceling-the-orders)
@@ -106,24 +113,37 @@ can create a Bid order and submit it to the order book. The created order is a b
 protected with the special _buyer contract_ holding the necessary amount of ERGs and checking in the
 contract the swap conditions (given `tokenId` and `tokenAmount` you want to buy).
 
-```
-// Buyer contract
-// pkA: SigmaProp - public key of the buyer (Alice)
-// tokenId: Coll[Byte] - token id you want to buy
-// tokenAmount: Long - token amount you want to buy
-{
-  pkA || {
-    val tokens = OUTPUTS(0).tokens
-    val tokenDataCorrect = tokens.nonEmpty &&
-      tokens(0)._1 == tokenId &&
-      tokens(0)._2 >= tokenAmount
-    val knownId = OUTPUTS(0).R4[Coll[Byte]].get == SELF.id
-    tokenDataCorrect &&
-    OUTPUTS(0).propositionBytes == pkA.propBytes &&
-    knownId
+```scala
+  /** Buyer's contract for DEX
+    * @param tokenId token id to buy
+    * @param tokenAmount token amount to buy
+    * @param pkA public key for the buyer
+    * @return compiled contract
+    */
+  def buyer(
+    ctx: Context,
+    tokenId: Coll[Byte],
+    tokenAmount: Long,
+    pkA: SigmaProp
+  ): SigmaProp = {
+    import ctx._
+    pkA || {
+      (OUTPUTS.nonEmpty && OUTPUTS(0).R4[Coll[Byte]].isDefined) && {
+        val tokens = OUTPUTS(0).tokens
+        val tokenDataCorrect = tokens.nonEmpty &&
+          tokens(0)._1 == tokenId &&
+          tokens(0)._2 >= tokenAmount
+
+        val knownId = OUTPUTS(0).R4[Coll[Byte]].get == SELF.id
+        // TODO fix Coll.fromItems crashing Inox typer and rewrite with allOf(Coll.fromItems[Boolean](
+        tokenDataCorrect &&
+        OUTPUTS(0).propositionBytes == pkA.propBytes &&
+        knownId
+      }
+    }
   }
-}
 ```  
+from [certified contract repository](http://github.com/ergoplatform/ergo-contracts/blob/5d064a71d2300684d18069912776b0e125f5c5bd/verified-contracts/src/main/scala/org/ergoplatform/contracts/AssetsAtomicExchange.scala#L12-L40)
 
 The buyer contract guarantees that the buyer box can be spent:
 1) by the buyer itself, which is the way for the buyer to [cancel the order](#canceling-the-orders)
