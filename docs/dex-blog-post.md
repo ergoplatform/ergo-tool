@@ -68,6 +68,7 @@ contract_ holding the minimum amount of ERGs (`minErg`) and `tokenAmount` of the
 ```
 // Seller contract
 // pkB: SigmaProp - public key of the seller (Bob)
+// ergAmount - nanoERG amount you want to receive for you tokens
 {
   pkB || {
     val knownBoxId = OUTPUTS(1).R4[Coll[Byte]].get == SELF.id
