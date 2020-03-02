@@ -22,14 +22,16 @@ to fill this gap and give updates on both new network and tooling development.
 
 Ergo have expressive smart contracts and transaction model which allows an
 implementation of fully trustless DEX protocol, in which signed buy and sell orders can be
-put into blockchain independently by buyers and sellers. The off-chain matching
-service can observe Ergo blockchain, find matching orders and submit the swap
+put into the blockchain independently by buyers and sellers. An off-chain matching
+service can observe the Ergo blockchain, find matching orders and submit the swap
 transaction without knowing any secrets. The matching can be incentivized by _DEX reward_
 payed as part of a _swap transaction_. Anyone who first discover the match of the two
 orders can create the swap transaction and get a reward in ERGs.
 
 In this post we describe a simple yet functional implementation of DEX protocol
-within ErgoTool - a command line interface (CLI) utility for Ergo.  
+as a command line interface (CLI) utility using [Ergo Commands]() framework.  
+
+## DEX Transactions Overview
 
 ![DEX](DEXDiagram.png)
 
@@ -86,7 +88,9 @@ contract_ holding the minimum amount of ERGs (`minErg`) and `tokenAmount` of the
     }
   }
 ```
-from [certified contract repository](http://github.com/ergoplatform/ergo-contracts/blob/391912fbd466c1b262e8d2fa61d4bfd94981df4a/verified-contracts/src/main/scala/org/ergoplatform/contracts/AssetsAtomicExchange.scala#L41-L58)
+The contract is implemented in [the
+repository](http://github.com/ergoplatform/ergo-contracts/blob/391912fbd466c1b262e8d2fa61d4bfd94981df4a/verified-contracts/src/main/scala/org/ergoplatform/contracts/AssetsAtomicExchange.scala#L41-L58)
+of certified contracts.
 
 The seller contract guarantees that the seller box can be spent: 
 1) by seller itself, which is the way for a seller to [cancel the order](#canceling-the-orders)
@@ -142,7 +146,9 @@ contract the swap conditions (given `tokenId` and `tokenAmount` you want to buy)
     }
   }
 ```  
-from [certified contract repository](http://github.com/ergoplatform/ergo-contracts/blob/5d064a71d2300684d18069912776b0e125f5c5bd/verified-contracts/src/main/scala/org/ergoplatform/contracts/AssetsAtomicExchange.scala#L12-L40)
+The contract is implemented in [the
+repository](http://github.com/ergoplatform/ergo-contracts/blob/5d064a71d2300684d18069912776b0e125f5c5bd/verified-contracts/src/main/scala/org/ergoplatform/contracts/AssetsAtomicExchange.scala#L12-L40)
+of certified contracts.
 
 The buyer contract guarantees that the buyer box can be spent:
 1) by the buyer itself, which is the way for the buyer to [cancel the order](#canceling-the-orders)
