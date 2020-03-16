@@ -21,11 +21,12 @@ import org.ergoplatform.appkit.ErgoToken
 import org.ergoplatform.appkit.ErgoTreeTemplate
 import org.ergoplatform.appkit.cli.{ConsoleTesting, Console, ConfigOption}
 
-class ErgoToolSpec 
+class ErgoToolSpec
   extends PropSpec 
   with Matchers 
   with ScalaCheckDrivenPropertyChecks 
-  with ConsoleTesting 
+  with ConsoleTesting
+  with CommandsTesting
   with MockitoSugar 
   with ArgumentMatchersSugar {
 
@@ -39,73 +40,9 @@ class ErgoToolSpec
   val masterKey = "18258e98ea87256806275b71cb203dc234752488e01985d405426e5c6f4ea1d1efe92e5adfcaa6f61173108305f7e3ba4ec9643a81dffa347879cf4d58d2a10006000200000000"
 
   val responsesDir = "src/test/resources/mockwebserver"
-  def loadNodeResponse(name: String) = {
-    FileUtil.read(FileUtil.file(s"$responsesDir/node_responses/$name"))
-  }
-  def loadExplorerResponse(name: String) = {
-    FileUtil.read(FileUtil.file(s"$responsesDir/explorer_responses/$name"))
-  }
 
   // NOTE, mainnet data is used for testing
   val testConfigFile = "ergo_tool_config.json"
-
-  case class MockData(nodeResponses: Seq[String] = Nil, explorerResponses: Seq[String] = Nil)
-  object MockData {
-    def empty = MockData()
-  }
-
-  def runErgoTool(console: Console, name: String, args: Seq[String], data: MockData = MockData.empty) = {
-    ErgoTool.run(name +: (Seq(ConfigOption.cmdText, testConfigFile) ++ args), console, {
-      ctx => {
-        val nrs = IndexedSeq(
-          loadNodeResponse("response_NodeInfo.json"),
-          loadNodeResponse("response_LastHeaders.json")) ++ data.nodeResponses
-        val ers: IndexedSeq[String] = data.explorerResponses.toIndexedSeq
-        new FileMockedErgoClient(nrs.convertTo[JList[JString]], ers.convertTo[JList[JString]])
-      }
-    })
-  }
-
-  /** Run the given command with expected console scenario (print and read operations)
-   * @param name the command
-   * @param args arguments of command line
-   * @param expectedConsoleScenario input and output operations with the console (see parseScenario)
-   */
-  def runCommand(name: String, args: Seq[String], expectedConsoleScenario: String, data: MockData = MockData.empty): String = {
-    val consoleOps = parseScenario(expectedConsoleScenario)
-    runScenario(consoleOps) { console =>
-      runErgoTool(console, name, args, data)
-    }
-  }
-
-  def runCommandWithCtxStubber(name: String,
-    args: Seq[String],
-    expectedConsoleScenario: String,
-    data: MockData = MockData.empty,
-    ctxStubber: BlockchainContext => Unit): String = {
-    val consoleOps = parseScenario(expectedConsoleScenario)
-    runScenario(consoleOps) { console =>
-      ErgoTool.run(name +: (Seq(ConfigOption.cmdText, testConfigFile) ++ args), console, {
-        ctx => {
-          val nrs = IndexedSeq(
-            loadNodeResponse("response_NodeInfo.json"),
-            loadNodeResponse("response_LastHeaders.json")) ++ data.nodeResponses
-          val ers: IndexedSeq[String] = data.explorerResponses.toIndexedSeq
-          new FileMockedErgoClientWithStubbedCtx(nrs.convertTo[JList[JString]], 
-            ers.convertTo[JList[JString]],
-            ctx => { val spiedCtx = spy(ctx); ctxStubber(spiedCtx); spiedCtx })
-        }
-      })
-    }
-  }
-
-  def testCommand(name: String, args: Seq[String], expectedConsoleScenario: String, data: MockData = MockData.empty): Unit = {
-    val consoleOps = parseScenario(expectedConsoleScenario)
-    testScenario(consoleOps) { console =>
-      runErgoTool(console, name, args, data)
-    }
-    ()
-  }
 
   property("address command") {
     testCommand("address", Seq("testnet", mnemonic),
