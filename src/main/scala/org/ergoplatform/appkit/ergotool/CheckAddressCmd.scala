@@ -4,6 +4,7 @@ import org.ergoplatform.appkit.cli.AppContext
 import org.ergoplatform.appkit.commands.{CmdParameter, NetworkPType, AddressPType, PasswordInput, Cmd, SecretStringPType, CmdDescriptor}
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.{NetworkType, Address, SecretString}
+import org.ergoplatform.appkit.commands.NewPasswordInput
 
 /** Given [[network]], [[mnemonic]], [[mnemonicPass]] and [[address]] checks that the address
   * belongs to the given network and corresponds to the given mnemonic and mnemonic password.
@@ -40,15 +41,16 @@ case class CheckAddressCmd(
 }
 
 object CheckAddressCmd extends CmdDescriptor(
-  name = "checkAddress", cmdParamSyntax = "testnet|mainnet <mnemonic> <address>",
+  name = "checkAddress", cmdParamSyntax = "testnet|mainnet <address>",
   description = "Check the given mnemonic and password pair correspond to the given address") {
 
   override val parameters: Seq[CmdParameter] = Array(
     CmdParameter("network", NetworkPType,
       "[[NetworkType]] of the target network for which the address should be generated"),
-    CmdParameter("mnemonic", SecretStringPType,
+    CmdParameter("mnemonic", "Mnemonic", SecretStringPType,
       """secret phrase which is used to generate (private, public) key pair, of which
-       |public key is used to generate the [[Address]]""".stripMargin),
+       |public key is used to generate the [[Address]]""".stripMargin, None, 
+       Some(PasswordInput), None),
     CmdParameter("mnemonicPass", "Mnemonic password", SecretStringPType,
       "password which is used to additionally protect mnemonic", None,
       Some(PasswordInput), None),
