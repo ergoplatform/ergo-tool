@@ -2,7 +2,7 @@
 
 ## Introduction
 
-[ErgoTool](https://github.com/aslesarenko/ergo-tool) is a command line interface (CLI) for
+[ErgoTool](https://github.com/ergoplatform/ergo-tool) is a command line interface (CLI) for
 [Ergo blockchain](https://ergoplatform.org/). You can use ErgoTool without running your
 own Ergo node. Even though running a node is the most secure way to communicate with the
 Ergo blockchain network, ErgoTool however, aims to provide more foundational tools at
@@ -15,7 +15,7 @@ ErgoTool commands.
 ## Getting Started
 
 First of all we need to install ErgoTool on our system from sources by following the
-[installation instructions](https://github.com/aslesarenko/ergo-tool#installation). In the
+[installation instructions](https://github.com/ergoplatform/ergo-tool#installation). In the
 directory where we cloned ErgoTool there is `ergo-tool.sh` script which we are going to
 use to run commands. Run the following command to check ErgoTool is installed correctly.
 ```
@@ -25,7 +25,7 @@ command name is not specified (run ergo-tool without arguments to list commands)
 Command Name:	help
 Usage Syntax:	ergo-tool help <commandName>
 Description:	prints usage help for a command
-Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/HelpCmd.html
+Doc page:	https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/HelpCmd.html
 ```
 Let's see what we get here. ErgoTool outputs the error message with the information about
 `help` command. This is a typical output of ErgoTool when one of the known commands is
@@ -68,7 +68,7 @@ $ ./ergo-tool.sh help createStorage
 Command Name:	createStorage
 Usage Syntax:	ergo-tool createStorage [<storageDir>="storage"] [<storageFileName>="secret.json"]
 Description:	Creates an encrypted storage file for the mnemonic entered by the user
-Doc page:       https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/CreateStorageCmd.html
+Doc page:       https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/CreateStorageCmd.html
 
 $ ./ergo-tool.sh createStorage 
 Enter Mnemonic Phrase> bird harbor wheat innocent business disease busy quick yellow trust time oil enter situate moon
@@ -103,7 +103,7 @@ $ ./ergo-tool.sh help extractStorage
 Command Name:	extractStorage
 Usage Syntax:	ergo-tool extractStorage <storage file> address|masterKey|publicKey|secretKey mainnet|testnet
 Description:	Reads the file, unlocks it using password and extract the requested property from the given storage file.
-Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/ExtractStorageCmd.html 
+Doc page:	https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/ExtractStorageCmd.html 
 
 $ ./ergo-tool.sh extractStorage storage/secret.json address mainnet     
 Storage password> 
@@ -152,7 +152,7 @@ Command Name:	send
 Usage Syntax:	ergo-tool send <storageFile> <recipientAddr> <amountToSend>
 Description:	send the given <amountToSend> to the given <recipientAddr> using 
  the given <storageFile> to sign transaction (requests storage password)
-Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/SendCmd.html
+Doc page:	https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/SendCmd.html
 ```
 The storage file is necessary in order to access secret key and generate a signature. The
 storage password will be requested by ErgoTool to unlock and decipher the file content.
@@ -275,6 +275,6 @@ The extensibility of ErgoTool is a subject of the next planned blog post, stay t
 
 1. [Ergo Site](https://ergoplatform.org/en/)
 2. [Ergo Sources](https://github.com/ergoplatform/ergo)
-3. [Ergo Appkit](https://github.com/aslesarenko/ergo-appkit)
-4. [Ergo Tool](https://github.com/aslesarenko/ergo-tool)
+3. [Ergo Appkit](https://github.com/ergoplatform/ergo-appkit)
+4. [Ergo Tool](https://github.com/ergoplatform/ergo-tool)
 
