@@ -184,6 +184,33 @@ Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/er
 Here is an [example](https://gist.github.com/greenhat/6b1b2f7be1279de49e33045b3fac6f81) of using
 `dex:ListMyOrders`.
 
+## Show order book
+
+To show all outstanding sell and buy orders for a particular token use `dex:ShowOrderBook` command:
+```
+java -jar ../ergotool-3.1.1.jar --conf ergo_tool_config.json dex:ShowOrderBook
+parameter 'tokenId' is not specified (run 'ergo-tool help dex:ShowOrderBook' for usage help)
+
+Command Name:	dex:ShowOrderBook
+Usage Syntax:	ergo-tool dex:ShowOrderBook <tokenId>
+Description:	show order book, sell and buy order for a given token id
+Doc page:	https://aslesarenko.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/dex/ShowOrderBookCmd.html
+```
+
+Here is an example of using `dex:ShowOrderBook`:
+```
+java -jar ../ergotool-3.1.1.jar --conf ergo_tool_config.json dex:ShowOrderBook "56cf33485be550cc32cf607255be8dc8c32522d0539f6f01d44028dc1d190450"
+Loading seller boxes... Ok
+Loading buyer boxes... Ok
+Order book for token 56cf33485be550cc32cf607255be8dc8c32522d0539f6f01d44028dc1d190450:
+Sell orders:
+  Amount   Total(including DEX fee)
+     100   1005000000
+Buy orders:
+  Amount   Total(including DEX fee)
+     100   1005000000
+```
+
 ## Cancel Order
 
 To cancel your buy/sell order you need to "spend" the box of the order by sending its assets (coins
