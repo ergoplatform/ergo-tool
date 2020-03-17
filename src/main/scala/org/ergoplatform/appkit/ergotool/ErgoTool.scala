@@ -3,8 +3,6 @@ package org.ergoplatform.appkit.ergotool
 import org.ergoplatform.appkit.commands._
 import org.ergoplatform.appkit.RestApiErgoClient
 import org.ergoplatform.appkit.cli.{Console, CliApplication}
-import org.ergoplatform.appkit.ergotool.dex.{CreateBuyOrderCmd, CreateSellOrderCmd, CancelOrderCmd, ListMatchingOrdersCmd, MatchOrdersCmd, IssueTokenCmd, ListMyOrdersCmd}
-import org.ergoplatform.appkit.ergotool.dex.ShowOrderBookCmd
 
 
 
@@ -17,9 +15,7 @@ object ErgoTool extends CliApplication {
   override def commands: Seq[CmdDescriptor] = super.commands ++ Array(
     AddressCmd, MnemonicCmd, CheckAddressCmd,
     ListAddressBoxesCmd,
-    CreateStorageCmd, ExtractStorageCmd, SendCmd,
-    CreateSellOrderCmd, CreateBuyOrderCmd, MatchOrdersCmd,
-    ListMatchingOrdersCmd, IssueTokenCmd, CancelOrderCmd, ListMyOrdersCmd, ShowOrderBookCmd
+    CreateStorageCmd, ExtractStorageCmd, SendCmd
   )
 
   /** Main entry point of console application. */
