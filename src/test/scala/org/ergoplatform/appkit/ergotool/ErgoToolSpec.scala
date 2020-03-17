@@ -30,7 +30,7 @@ class ErgoToolSpec
   property("address command") {
     testCommand(ErgoTool, "address", Seq("testnet"),
       expectedConsoleScenario =
-        s"""Mnemonic>::$mnemonic;
+        s"""Enter Mnemonic>::$mnemonic;
            |Mnemonic password>::$mnemonicPassword;
            |$addrStr::;
            |""".stripMargin)
@@ -44,7 +44,7 @@ class ErgoToolSpec
   property("checkAddress command") {
     testCommand(ErgoTool, "checkAddress", Seq("testnet", addrStr),
       expectedConsoleScenario =
-        s"""Mnemonic>::$mnemonic;
+        s"""Enter Mnemonic>::$mnemonic;
            |Mnemonic password>::$mnemonicPassword;
            |Ok::;
            |""".stripMargin)
@@ -53,7 +53,7 @@ class ErgoToolSpec
   property("checkAddress command validates address format") {
     val res = runCommand(ErgoTool, "checkAddress", Seq("testnet", "someaddress"),
       expectedConsoleScenario =
-        s"""Mnemonic>::$mnemonic;
+        s"""Enter Mnemonic>::$mnemonic;
           |Mnemonic password>::$mnemonicPassword;
           |""".stripMargin)
     res should include ("Invalid address encoding, expected base58 string: someaddress")
@@ -63,7 +63,7 @@ class ErgoToolSpec
     val res = runCommand(ErgoTool, "checkAddress",
       args = Seq("testnet", "9f4QF8AD1nQ3nJahQVkMj8hFSVVzVom77b52JU7EW71Zexg6N8v"),
       expectedConsoleScenario =
-        s"""Mnemonic>::$mnemonic;
+        s"""Enter Mnemonic>::$mnemonic;
           |Mnemonic password> ::$mnemonicPassword;
           |""".stripMargin)
     res should include ("Network type of the address MAINNET don't match expected TESTNET")

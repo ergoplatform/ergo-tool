@@ -5,6 +5,7 @@ import org.ergoplatform.appkit.commands.{CmdParameter, NetworkPType, Cmd, Secret
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.{NetworkType, Address, SecretString}
 import org.ergoplatform.appkit.commands.PasswordInput
+import org.ergoplatform.appkit.commands.DefaultParameterInput
 
 /** Given [[mnemonic]], [[mnemonicPass]] and [[network]] the command computes
   * the address of the given network type.
@@ -43,8 +44,8 @@ object AddressCmd extends CmdDescriptor(
       "[[NetworkType]] of the target network for which the address should be generated"),
     CmdParameter("mnemonic", "Mnemonic", SecretStringPType,
       """secret phrase which is used to generate (private, public) key pair, of which
-        |public key is used to generate the [[Address]]""".stripMargin, None, 
-        Some(PasswordInput), None),
+        |public key is used to generate the [[Address]]""".stripMargin, None,
+        Some(DefaultParameterInput), None),
     CmdParameter("mnemonicPass", "Mnemonic password", SecretStringPType,
       "password which is used to additionally protect mnemonic", None,
       Some(PasswordInput), None)
