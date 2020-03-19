@@ -3,13 +3,13 @@ package org.ergoplatform.appkit.ergotool
 import org.scalatest.{PropSpec, Matchers}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import java.nio.file.{Files, Paths}
-
-import org.ergoplatform.appkit.cli.{ConsoleTesting, CommandsTesting}
+import org.ergoplatform.appkit.cli.ConsoleTesting
+import org.ergoplatform.appkit.cli.CommandsTesting
 
 class ErgoToolSpec
-  extends PropSpec 
-  with Matchers 
-  with ScalaCheckDrivenPropertyChecks 
+  extends PropSpec
+  with Matchers
+  with ScalaCheckDrivenPropertyChecks
   with ConsoleTesting
   with CommandsTesting {
 
@@ -28,12 +28,12 @@ class ErgoToolSpec
   val testConfigFile = "ergo_tool_config.json"
 
   property("address command") {
-    testCommand(ErgoTool, "address", Seq("testnet", mnemonic),
+    testCommand(ErgoTool, "address", Seq("testnet"),
       expectedConsoleScenario =
-        s"""Mnemonic password>::$mnemonicPassword;
-          |Repeat Mnemonic password>::$mnemonicPassword;
-          |$addrStr::;
-          |""".stripMargin)
+        s"""Enter Mnemonic>::$mnemonic;
+           |Mnemonic password>::$mnemonicPassword;
+           |$addrStr::;
+           |""".stripMargin)
   }
 
   property("mnemonic command") {
@@ -42,26 +42,29 @@ class ErgoToolSpec
   }
 
   property("checkAddress command") {
-    testCommand(ErgoTool, "checkAddress", Seq("testnet", mnemonic, addrStr),
+    testCommand(ErgoTool, "checkAddress", Seq("testnet", addrStr),
       expectedConsoleScenario =
-        s"""Mnemonic password>::$mnemonicPassword;
+        s"""Enter Mnemonic>::$mnemonic;
+           |Mnemonic password>::$mnemonicPassword;
            |Ok::;
            |""".stripMargin)
   }
 
   property("checkAddress command validates address format") {
-    val res = runCommand(ErgoTool, "checkAddress", Seq("testnet", mnemonic, "someaddress"),
+    val res = runCommand(ErgoTool, "checkAddress", Seq("testnet", "someaddress"),
       expectedConsoleScenario =
-        s"""Mnemonic password> ::$mnemonicPassword;
+        s"""Enter Mnemonic>::$mnemonic;
+          |Mnemonic password>::$mnemonicPassword;
           |""".stripMargin)
     res should include ("Invalid address encoding, expected base58 string: someaddress")
   }
 
   property("checkAddress command validates network type") {
     val res = runCommand(ErgoTool, "checkAddress",
-      args = Seq("testnet", mnemonic, "9f4QF8AD1nQ3nJahQVkMj8hFSVVzVom77b52JU7EW71Zexg6N8v"),
+      args = Seq("testnet", "9f4QF8AD1nQ3nJahQVkMj8hFSVVzVom77b52JU7EW71Zexg6N8v"),
       expectedConsoleScenario =
-        s"""Mnemonic password> ::$mnemonicPassword;
+        s"""Enter Mnemonic>::$mnemonic;
+          |Mnemonic password> ::$mnemonicPassword;
           |""".stripMargin)
     res should include ("Network type of the address MAINNET don't match expected TESTNET")
   }

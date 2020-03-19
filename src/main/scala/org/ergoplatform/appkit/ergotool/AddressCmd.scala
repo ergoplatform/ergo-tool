@@ -4,6 +4,8 @@ import org.ergoplatform.appkit.cli.AppContext
 import org.ergoplatform.appkit.commands.{CmdParameter, NetworkPType, Cmd, SecretStringPType, NewPasswordInput, CmdDescriptor}
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.{NetworkType, Address, SecretString}
+import org.ergoplatform.appkit.commands.PasswordInput
+import org.ergoplatform.appkit.commands.DefaultParameterInput
 
 /** Given [[mnemonic]], [[mnemonicPass]] and [[network]] the command computes
   * the address of the given network type.
@@ -34,18 +36,19 @@ case class AddressCmd
 
 /** Descriptor and parser of the `address` command. */
 object AddressCmd extends CmdDescriptor(
-  name = "address", cmdParamSyntax = "testnet|mainnet <mnemonic>",
+  name = "address", cmdParamSyntax = "testnet|mainnet",
   description = "return address for a given mnemonic and password pair") {
 
   override val parameters: Seq[CmdParameter] = Array(
     CmdParameter("network", NetworkPType,
       "[[NetworkType]] of the target network for which the address should be generated"),
-    CmdParameter("mnemonic", SecretStringPType,
+    CmdParameter("mnemonic", "Mnemonic", SecretStringPType,
       """secret phrase which is used to generate (private, public) key pair, of which
-        |public key is used to generate the [[Address]]""".stripMargin),
+        |public key is used to generate the [[Address]]""".stripMargin, None,
+        Some(DefaultParameterInput), None),
     CmdParameter("mnemonicPass", "Mnemonic password", SecretStringPType,
       "password which is used to additionally protect mnemonic", None,
-      Some(NewPasswordInput), None)
+      Some(PasswordInput), None)
   )
 
   override def createCmd(ctx: AppContext): Cmd = {
