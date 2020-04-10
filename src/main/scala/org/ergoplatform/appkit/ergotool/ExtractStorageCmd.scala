@@ -1,7 +1,9 @@
 package org.ergoplatform.appkit.ergotool
 
+import org.ergoplatform.appkit.cli.AppContext
+import org.ergoplatform.appkit.commands.{CmdParameter, NetworkPType, EnumPType, PasswordInput, Cmd, SecretStringPType, StringPType, CmdDescriptor}
 import org.ergoplatform.appkit.config.ErgoToolConfig
-import org.ergoplatform.appkit.{NetworkType, SecretStorage}
+import org.ergoplatform.appkit.{NetworkType, SecretStorage, SecretString}
 import org.ergoplatform.wallet.secrets.ExtendedSecretKeySerializer
 import scorex.util.encode.Base16
 
@@ -25,18 +27,18 @@ import scorex.util.encode.Base16
   * to obtain address both from mainnet and from testnet.
   *
   * @param storageFile path to encrypted storage file
-  * @param storagePass encryption password necessary to access storage file content
   * @param prop        name of the secret data stored in the file (e.g. [[PropAddress]])
   * @param network     network type
+  * @param storagePass encryption password necessary to access storage file content
   */
 case class ExtractStorageCmd(
     toolConf: ErgoToolConfig, name: String,
-    storageFile: String, storagePass: Array[Char], prop: String, network: NetworkType) extends Cmd {
+    storageFile: String, prop: String, network: NetworkType, storagePass: SecretString) extends Cmd {
   import ExtractStorageCmd._
   override def run(ctx: AppContext): Unit = {
     val console = ctx.console
     val storage = SecretStorage.loadFrom(storageFile)
-    storage.unlock(String.valueOf(storagePass))
+    storage.unlock(storagePass)
     val secret = storage.getSecret
     prop match {
       case PropAddress =>
@@ -69,21 +71,26 @@ object ExtractStorageCmd extends CmdDescriptor(
   val supportedKeys: Seq[String] = Array(PropAddress, PropMasterKey, PropPublicKey, PropSecretKey)
   override val cmdParamSyntax = s"<storage file> ${supportedKeys.mkString("|")} mainnet|testnet"
 
-  private def propErrorMsg = {
-    error(s"Please specify one of the supported properties: ${supportedKeys.map(k => s"`$k`").mkString(",")}")
-  }
+  override val parameters: Seq[CmdParameter] = Array(
+    CmdParameter("storageFile", StringPType,
+      "path to encrypted storage file"),
+    CmdParameter("propName", EnumPType(supportedKeys zip supportedKeys),
+      "secret mnemonic password"),
+    CmdParameter("network", NetworkPType,
+      "network type"),
+    CmdParameter("storagePass", "Storage password", SecretStringPType,
+      "secret storage password", None,
+      Some(PasswordInput), None)
+  )
 
-  private def parsePropName(prop: String): String =
-    if (supportedKeys.contains(prop)) prop
-    else propErrorMsg
+  override def createCmd(ctx: AppContext): Cmd = {
+    val Seq(
+      storageFile: String,
+      prop: String,
+      network: NetworkType,
+      storagePass: SecretString) = ctx.cmdParameters
 
-  override def parseCmd(ctx: AppContext): Cmd = {
-    val args = ctx.cmdArgs
-    val storageFile = if (args.length > 1) args(1) else error("storage file is not specified")
-    val prop = if (args.length > 2) parsePropName(args(2)) else propErrorMsg
-    val network = parseNetwork(if (args.length > 3) args(3) else error("please specify network type (mainnet|testnet)"))
-    val storagePass = ctx.console.readPassword("Storage password> ")
-    ExtractStorageCmd(ctx.toolConf, name, storageFile, storagePass, prop, network)
+    ExtractStorageCmd(ctx.toolConf, name, storageFile, prop, network, storagePass)
   }
 }
 

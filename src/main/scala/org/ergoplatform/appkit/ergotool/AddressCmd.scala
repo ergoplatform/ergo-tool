@@ -1,7 +1,11 @@
 package org.ergoplatform.appkit.ergotool
 
+import org.ergoplatform.appkit.cli.AppContext
+import org.ergoplatform.appkit.commands.{CmdParameter, NetworkPType, Cmd, SecretStringPType, NewPasswordInput, CmdDescriptor}
 import org.ergoplatform.appkit.config.ErgoToolConfig
-import org.ergoplatform.appkit.{NetworkType, Address}
+import org.ergoplatform.appkit.{NetworkType, Address, SecretString}
+import org.ergoplatform.appkit.commands.PasswordInput
+import org.ergoplatform.appkit.commands.DefaultParameterInput
 
 /** Given [[mnemonic]], [[mnemonicPass]] and [[network]] the command computes
   * the address of the given network type.
@@ -20,27 +24,35 @@ import org.ergoplatform.appkit.{NetworkType, Address}
   * @param mnemonicPass password which is used to additionally protect mnemonic
   * @see [[AddressCmd$]] descriptor of the `address` command
   */
-case class AddressCmd(
-    toolConf: ErgoToolConfig,
-    name: String, network: NetworkType, mnemonic: String, mnemonicPass: Array[Char])
+case class AddressCmd
+( toolConf: ErgoToolConfig,
+  name: String, network: NetworkType, mnemonic: SecretString, mnemonicPass: SecretString)
   extends Cmd {
   override def run(ctx: AppContext): Unit = {
-    val address = Address.fromMnemonic(network, mnemonic, String.valueOf(mnemonicPass))
+    val address = Address.fromMnemonic(network, mnemonic, mnemonicPass)
     ctx.console.print(address.toString)
   }
 }
 
 /** Descriptor and parser of the `address` command. */
 object AddressCmd extends CmdDescriptor(
-  name = "address", cmdParamSyntax = "testnet|mainnet <mnemonic>",
+  name = "address", cmdParamSyntax = "testnet|mainnet",
   description = "return address for a given mnemonic and password pair") {
 
-  override def parseCmd(ctx: AppContext): Cmd = {
-    val args = ctx.cmdArgs
-    val network = if (args.length > 1) args(1) else usageError("network is not specified (mainnet or testnet)")
-    val networkType = parseNetwork(network)
-    val mnemonic = if (args.length > 2) args(2) else usageError("mnemonic is not specified")
-    val mnemonicPass = readNewPassword("Mnemonic password> ", "Repeat mnemonic password> ")(ctx)
+  override val parameters: Seq[CmdParameter] = Array(
+    CmdParameter("network", NetworkPType,
+      "[[NetworkType]] of the target network for which the address should be generated"),
+    CmdParameter("mnemonic", "Mnemonic", SecretStringPType,
+      """secret phrase which is used to generate (private, public) key pair, of which
+        |public key is used to generate the [[Address]]""".stripMargin, None,
+        Some(DefaultParameterInput), None),
+    CmdParameter("mnemonicPass", "Mnemonic password", SecretStringPType,
+      "password which is used to additionally protect mnemonic", None,
+      Some(PasswordInput), None)
+  )
+
+  override def createCmd(ctx: AppContext): Cmd = {
+    val Seq(networkType: NetworkType, mnemonic: SecretString, mnemonicPass: SecretString) = ctx.cmdParameters
     AddressCmd(ctx.toolConf, name, networkType, mnemonic, mnemonicPass)
   }
 }

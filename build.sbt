@@ -8,21 +8,29 @@ lazy val sonatypeSnapshots = "Sonatype Snapshots" at "https://oss.sonatype.org/c
 
 resolvers ++= Seq(Resolver.mavenLocal, sonatypeReleases, sonatypeSnapshots, Resolver.mavenCentral)
 
+scalaVersion := "2.12.10"
 version := "3.1.1"
-val appkit = "org.ergoplatform" %% "ergo-appkit" % "3.1.2"
+val appkit = "org.ergoplatform" %% "ergo-appkit" % "3.2.1"
+
+val mockitoScalaVerstion = "1.11.4"
 
 libraryDependencies ++= Seq(
   appkit, (appkit % Test).classifier("tests"),
   //.classifier("tests-sources") // uncomment this for debuging to make sources available (doesn't work when appkit is published locally) ,
   "org.graalvm.sdk" % "graal-sdk" % "19.2.1",
   "com.squareup.okhttp3" % "mockwebserver" % "3.12.0",
+  "org.ergoplatform" %% "verified-contracts" % "0.0.0-5-ee53f015-SNAPSHOT",
   "org.scalatest" %% "scalatest" % "3.0.8" % "test",
-  "org.scalacheck" %% "scalacheck" % "1.14.1" % "test"
+  "org.scalacheck" %% "scalacheck" % "1.14.1" % "test",
+  "org.mockito" %% "mockito-scala" % mockitoScalaVerstion % "test",
+  "org.mockito" %% "mockito-scala-scalatest" % mockitoScalaVerstion % "test"
 )
 
 publishMavenStyle in ThisBuild := true
 
 publishArtifact in Test := false
+
+fork in Test := false
 
 pomExtra in ThisBuild :=
   <developers>
@@ -39,6 +47,7 @@ pomExtra in ThisBuild :=
 // see https://github.com/scala/community-builds/issues/796#issuecomment-423395500
 scalacOptions in(Compile, compile) ++= (if (scalaBinaryVersion.value == "2.11") Seq() else Seq("-release", "8"))
 
+test in assembly := {}
 assemblyJarName in assembly := s"ergotool-${version.value}.jar"
 
 // See https://www.scala-sbt.org/sbt-native-packager/formats/graalvm-native-image.html

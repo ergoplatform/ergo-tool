@@ -3,8 +3,10 @@ package org.ergoplatform.appkit.ergotool
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit._
 import java.io.File
+
 import org.ergoplatform.appkit.Parameters.MinFee
-import Utils._
+import org.ergoplatform.appkit.cli.AppContext
+import org.ergoplatform.appkit.commands.{CmdParameter, FilePType, AddressPType, LongPType, RunWithErgoClient, PasswordInput, Cmd, SecretStringPType, CmdDescriptor}
 
 /** Creates and sends a new transaction to transfer Ergs from one address to another.
   *
@@ -22,14 +24,17 @@ import Utils._
   * @param storageFile storage with secret key of the sender
   * @param storagePass password to access sender secret key in the storage
   * @param recipient    address of the recepient of the transfer
-  * @param amountToSend amount of NanoErg to transfer to recipient
+  * @param amountToSend amount of NanoERG to transfer to recipient
   */
-case class SendCmd(toolConf: ErgoToolConfig, name: String, storageFile: File, storagePass: Array[Char], recipient: Address, amountToSend: Long) extends Cmd with RunWithErgoClient {
+case class SendCmd( toolConf: ErgoToolConfig, name: String, storageFile: File, storagePass: SecretString,
+  recipient: Address, amountToSend: Long) extends Cmd with RunWithErgoClient {
   override def runWithClient(ergoClient: ErgoClient, runCtx: AppContext): Unit = {
+    if (amountToSend < MinFee) error(s"Please specify amount no less than $MinFee (MinFee)")
+
     val console = runCtx.console
     ergoClient.execute(ctx => {
       val senderProver = loggedStep("Creating prover", console) {
-        BoxOperations.createProver(ctx, storageFile.getPath, String.valueOf(storagePass))
+        BoxOperations.createProver(ctx, storageFile.getPath, storagePass).build()
       }
       val sender = senderProver.getAddress
       val unspent = loggedStep(s"Loading unspent boxes from at address $sender", console) {
@@ -68,16 +73,27 @@ case class SendCmd(toolConf: ErgoToolConfig, name: String, storageFile: File, st
 object SendCmd extends CmdDescriptor(
   name = "send", cmdParamSyntax = "<storageFile> <recipientAddr> <amountToSend>",
   description = "send the given <amountToSend> to the given <recipientAddr> using \n " +
-      "the given <storageFile> to sign transaction (requests storage password)") {
+    "the given <storageFile> to sign transaction (requests storage password)") {
 
-  override def parseCmd(ctx: AppContext): Cmd = {
-    val args = ctx.cmdArgs
-    val storageFile = new File(if (args.length > 1) args(1) else error("Wallet storage file path is not specified"))
-    if (!storageFile.exists()) error(s"Specified wallet file is not found: $storageFile")
-    val recipient = Address.create(if (args.length > 2) args(2) else error("recipient address is not specified"))
-    val amountToSend = if (args.length > 3) args(3).toLong else error("amountToSend is not specified")
-    if (amountToSend < MinFee) error(s"Please specify amount no less than $MinFee (MinFee)")
-    val pass = ctx.console.readPassword("Storage password>")
+  override val parameters: Seq[CmdParameter] = Array(
+    CmdParameter("storageFile", FilePType,
+      "storage with secret key of the sender"),
+    CmdParameter("storagePass", "Storage password", SecretStringPType,
+      "password to access sender secret key in the storage", None,
+      Some(PasswordInput), None),
+    CmdParameter("recipientAddr", AddressPType,
+      "address of the recipient of the transfer"),
+    CmdParameter("amountToSend", LongPType,
+      "amount of NanoERG to transfer to recipient")
+  )
+
+  override def createCmd(ctx: AppContext): Cmd = {
+    val Seq(
+      storageFile: File,
+      pass: SecretString,
+      recipient: Address,
+      amountToSend: Long) = ctx.cmdParameters
+
     SendCmd(ctx.toolConf, name, storageFile, pass, recipient, amountToSend)
   }
 }

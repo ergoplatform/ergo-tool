@@ -2,6 +2,8 @@ package org.ergoplatform.appkit.ergotool
 
 import org.ergoplatform.appkit.config.ErgoToolConfig
 import org.ergoplatform.appkit.Mnemonic
+import org.ergoplatform.appkit.cli.AppContext
+import org.ergoplatform.appkit.commands.{CmdDescriptor, Cmd}
 
 /** Generates a new mnemonic phrase using english words and default cryptographic strength
   * parameters (number of random bits, which is 160 by default).
@@ -22,7 +24,7 @@ object MnemonicCmd extends CmdDescriptor(
   name = "mnemonic", cmdParamSyntax = "",
   description = "generate new mnemonic phrase using english words and default cryptographic strength") {
 
-  override def parseCmd(ctx: AppContext): Cmd = {
+  override def createCmd(ctx: AppContext): Cmd = {
     MnemonicCmd(ctx.toolConf, name)
   }
 }

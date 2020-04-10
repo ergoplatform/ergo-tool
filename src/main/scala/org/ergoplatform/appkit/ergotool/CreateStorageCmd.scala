@@ -1,9 +1,11 @@
 package org.ergoplatform.appkit.ergotool
 
 import org.ergoplatform.appkit.config.ErgoToolConfig
-import org.ergoplatform.appkit.{Mnemonic, SecretStorage}
-import java.nio.file.{Files, StandardCopyOption, Paths}
-import java.util
+import org.ergoplatform.appkit.{Mnemonic, SecretStorage, SecretString}
+import java.nio.file.{Files, StandardCopyOption, Path, Paths}
+
+import org.ergoplatform.appkit.cli.AppContext
+import org.ergoplatform.appkit.commands.{DirPathPType, CmdParameter, DefaultParameterInput, Cmd, SecretStringPType, NewPasswordInput, StringPType, CmdDescriptor}
 
 /** Create a new json file with encrypted content storing a secret key.
   *
@@ -22,50 +24,62 @@ import java.util
   *    ([[storageFileName]]) of the given directory ([[storageDir]]).<br/>
   * 7) print the path to the created file to the console output
   *
-  * @param mnemonic    instance of [[Mnemonic]] holding both mnemonic phrase and mnemonic password.
-  * @param storagePass password used to encrypt the file and which is necessary to access and
-  *                    decipher the file.
   * @param storageDir  directory (relative to the current) where to put storage file (default is
   *                    "storage")
   * @param storageFileName name of the storage file (default is "secret.json")
+  * @param mnemonicPhrase instance of [[SecretString]] holding mnemonic phrase.
+  * @param mnemonicPass   instance of [[SecretString]] holding mnemonic password.
+  * @param storagePass password used to encrypt the file and which is necessary to access and
+  *                    decipher the file.
   */
-case class CreateStorageCmd(
-    toolConf: ErgoToolConfig, name: String,
-    mnemonic: Mnemonic, storagePass: Array[Char],
-    storageDir: String, storageFileName: String) extends Cmd {
+case class CreateStorageCmd
+( toolConf: ErgoToolConfig, name: String,
+  storageDir: String, storageFileName: String,  // TODO refactor: make single storagePath: Path parameter
+  mnemonicPhrase: SecretString,
+  mnemonicPass: SecretString,
+  storagePass: SecretString) extends Cmd {
   override def run(ctx: AppContext): Unit = {
-    val storage = SecretStorage.createFromMnemonicIn(storageDir, mnemonic, String.valueOf(storagePass))
-    util.Arrays.fill(storagePass, 0.asInstanceOf[Char])
+    val storagePath = Paths.get(storageDir, storageFileName)
+    if (Files.exists(storagePath)) error(s"File $storagePath already exists")
+
+    val mnemonic = Mnemonic.create(mnemonicPhrase, mnemonicPass)
+    val storage = SecretStorage.createFromMnemonicIn(storageDir, mnemonic, storagePass)
+    storagePass.erase()
     val filePath = Files.move(storage.getFile.toPath, Paths.get(storageDir, storageFileName), StandardCopyOption.ATOMIC_MOVE)
     ctx.console.println(s"Storage File: $filePath")
   }
 }
 object CreateStorageCmd extends CmdDescriptor(
-  name = "createStorage", cmdParamSyntax = "[<storageDir>=\"storage\"] [<storageFileName>=\"secret.json\"]",
+  name = "createStorage", cmdParamSyntax = "<storageDir> <storageFileName>]",
   description = "Creates an encrypted storage file for the mnemonic entered by the user") {
 
-  override def parseCmd(ctx: AppContext): Cmd = {
-    val args = ctx.cmdArgs
-    val console = ctx.console
-    val storageDir = if (args.length > 1) args(1) else "storage"
-    val storageFileName = if (args.length > 2) args(2) else "secret.json"
+  override val parameters: Seq[CmdParameter] = Array(
+    CmdParameter("storageDir", DirPathPType,
+      "directory (relative to the current) where to put storage file"),
+    CmdParameter("storageFileName", StringPType,
+      "name of the storage file"),
+    CmdParameter("mnemonicPhrase", "Mnemonic Phrase", SecretStringPType,
+      "secret mnemonic phrase", None,
+      Some(DefaultParameterInput), None),
+    CmdParameter("mnemonicPass", "Mnemonic password", SecretStringPType,
+      "secret mnemonic password", None,
+      Some(NewPasswordInput), None),
+    CmdParameter("storagePass", "Storage password", SecretStringPType,
+      "secret storage password", None,
+      Some(NewPasswordInput), None)
+  )
 
-    val storagePath = Paths.get(storageDir, storageFileName)
-    if (Files.exists(storagePath)) usageError(s"File $storagePath already exists")
 
-    val phrase = console.readLine("Enter mnemonic phrase> ")
-    val mnemonicPass = readNewPassword(3, console) {
-      val p1 = console.readPassword("Mnemonic password> ")
-      val p2 = console.readPassword("Repeat mnemonic password> ")
-      (p1, p2)
-    }
-    val mnemonic = Mnemonic.create(phrase, String.valueOf(mnemonicPass))
-    val storagePass = readNewPassword(3, console) {
-      val p1 = console.readPassword("Storage password> ")
-      val p2 = console.readPassword("Repeat storage password> ")
-      (p1, p2)
-    }
-    CreateStorageCmd(ctx.toolConf, name, mnemonic, storagePass, storageDir, storageFileName)
+  override def createCmd(ctx: AppContext): Cmd = {
+    val Seq(
+      storageDir: Path,
+      storageFileName: String,
+      mnemonicPhrase: SecretString,
+      mnemonicPass: SecretString,
+      storagePass: SecretString) = ctx.cmdParameters
+
+    CreateStorageCmd(ctx.toolConf, name, storageDir.toString, storageFileName, mnemonicPhrase, mnemonicPass, storagePass)
+
   }
 }
 
