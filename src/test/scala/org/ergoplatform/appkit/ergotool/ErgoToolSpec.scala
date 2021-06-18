@@ -131,7 +131,6 @@ class ErgoToolSpec
         loadNodeResponse("response_Box1.json"),
         loadNodeResponse("response_Box2.json"),
         loadNodeResponse("response_Box3.json"),
-        loadNodeResponse("response_Box4.json"),
         "21f84cf457802e66fb5930fb5d45fbe955933dc16a72089bf8980797f24e2fa1"),
       Seq(
         loadExplorerResponse("response_boxesByAddressUnspent.json")))
