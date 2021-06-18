@@ -22,7 +22,7 @@ object ErgoTool extends CliApplication {
   def main(args: Array[String]): Unit = {
     val console = Console.instance
     run(args, console, clientFactory = { ctx =>
-      RestApiErgoClient.create(ctx.apiUrl, ctx.networkType, ctx.apiKey)
+      RestApiErgoClient.create(ctx.apiUrl, ctx.networkType, ctx.apiKey, null /* use default */)
     })
   }
 
