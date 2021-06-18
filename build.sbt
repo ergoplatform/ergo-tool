@@ -9,8 +9,8 @@ lazy val sonatypeSnapshots = "Sonatype Snapshots" at "https://oss.sonatype.org/c
 resolvers ++= Seq(Resolver.mavenLocal, sonatypeReleases, sonatypeSnapshots, Resolver.mavenCentral)
 
 scalaVersion := "2.12.10"
-version := "3.1.1"
-val appkit = "org.ergoplatform" %% "ergo-appkit" % "develop-d9f8eee9-SNAPSHOT"
+version := "4.0.0"
+val appkit = "org.ergoplatform" %% "ergo-appkit" % "develop-a8049b1e-SNAPSHOT"
 
 val mockitoScalaVerstion = "1.11.4"
 
