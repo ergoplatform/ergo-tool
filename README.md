@@ -93,10 +93,16 @@ Available actions:
 	Creates an encrypted storage file for the mnemonic entered by user
   extractStorage <storage file> address|masterKey|publicKey|secretKey mainnet|testnet
 	Reads the file, unlocks it using password and extract the requested property from the given storage file.
+  extractStorage <storage file> address|masterKey|publicKey|secretKey mainnet|testnet
+        Reads the file, unlocks it using password and extract the requested property from the given storage file.
+  getBoxInfo <boxId>
+        list box content with tokens and register details
   help <commandName>
-	prints usage help for a command
-  listAddressBoxes address [<limit>=10]
-	list top <limit=10> confirmed unspent boxes owned by the given <address>
+        prints usage help for a command
+  listAddressBoxes [--limit-list <limit>] <address>
+        list top <limit> confirmed unspent boxes owned by the given <address>
+  listAddressTokens <address>
+        list tokens owned by the given <address>
   mnemonic 
 	generate new mnemonic phrase using english words and default cryptographic strength
   send <storageFile> <recipientAddr> <amountToSend>
@@ -198,8 +204,10 @@ Click on the command name to open its detailed description.
  [checkAddress](https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/CheckAddressCmd.html) | `<networkType> <mnemonic> <address>` <br/> Check the given mnemonic and password pair correspond to the given address
  [createStorage](https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/CreateStorageCmd.html) | `[<storageDir>="storage"] [<storageFileName>="secret.json"]` <br/> Creates an encrypted storage file for the mnemonic entered by user
  [extractStorage](https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/ExtractStorageCmd.html) | `<storage file> <property> <networkType>` <br/> Reads the file, unlocks it using password and extract the requested property from the given storage file. Where `property` is one of `address`, `masterKey`, `publicKey`, `secretKey`
+ [getBoxInfo](https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/GetBoxInfoCmd.html) | `boxId` <br/> list box content with tokens and register details
  [help](https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/HelpCmd.html) | `<commandName>` <br/> prints usage help for a command
  [listAddressBoxes](https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/ListAddressBoxesCmd.html) | `address [<limit>=10]` <br/> list top `limit=10` confirmed unspent boxes owned by the given `address`
+ [listAddressTokens](https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/ListAddressTokensCmd.html) | `address` <br/> list tokens owned by the given `address`
  [mnemonic](https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/MnemonicCmd.html) | generate new mnemonic phrase using english words and default cryptographic strength
  [send](https://ergoplatform.github.io/ergo-tool/api/org/ergoplatform/appkit/ergotool/SendCmd.html) | `<storageFile> <recipientAddr> <amountToSend>` <br/> send the given `amountToSend` to the given `recipientAddr` using the given `wallet file` to sign the transaction (it will also request storage password)
          
