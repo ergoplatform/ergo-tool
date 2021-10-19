@@ -84,6 +84,34 @@ class ErgoToolSpec
     res should include ("e050a3af38241ce444c34eb25c0ab880674fc23a0e63632633ae14f547141c37")
     res should include ("26d6e08027e005270b38e5c5f4a73ffdb6d65a3289efb51ac37f98ad395d887c")
   }
+  
+  property("getBoxInfo command") {
+    val data = MockData(
+      Seq(
+        loadNodeResponse("response_Box4.json")),
+    Seq(
+        loadExplorerResponse("response_boxesByAddressUnspent.json")))
+    val res = runCommand(ErgoTool, "getBoxInfo", Seq("356037af6e85980113f3071ec7b010202448a231ce74e441c0aae7241d82a20e"),
+      expectedConsoleScenario = "", data)
+    res should include ("356037af6e85980113f3071ec7b010202448a231ce74e441c0aae7241d82a20e")
+    res should include ("21f84cf457802e66fb5930fb5d45fbe955933dc16a72089bf8980797f24e2fa1")
+    res should include ("Amount: 60")
+    res should include ("ErgoTree(0,WrappedArray(),Right")
+  }
+  
+  property("listAddressTokens command") {
+    val data = MockData(
+      Seq(
+        loadNodeResponse("response_Box1.json"),
+        loadNodeResponse("response_Box2.json"),
+        loadNodeResponse("response_Box3.json"),
+        loadNodeResponse("response_Box4.json")),
+    Seq(
+        loadExplorerResponse("response_boxesByAddressUnspent.json")))
+    val res = runCommand(ErgoTool, "listAddressTokens", Seq("9hHDQb26AjnJUXxcqriqY1mnhpLuUeC81C4pggtK7tupr92Ea1K"),
+      expectedConsoleScenario = "", data)
+    res should include ("21f84cf457802e66fb5930fb5d45fbe955933dc16a72089bf8980797f24e2fa1 60")
+  }
 
   property("createStorage and extractStorage commands") {
     import ExtractStorageCmd._
