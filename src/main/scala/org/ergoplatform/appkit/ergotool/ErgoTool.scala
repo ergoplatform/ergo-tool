@@ -14,7 +14,7 @@ object ErgoTool extends CliApplication {
   /** Commands supported by this application. */
   override def commands: Seq[CmdDescriptor] = super.commands ++ Array(
     AddressCmd, MnemonicCmd, CheckAddressCmd,
-    ListAddressBoxesCmd,
+    ListAddressBoxesCmd, ListAddressTokensCmd, GetBoxInfoCmd,
     CreateStorageCmd, ExtractStorageCmd, SendCmd
   )
 
