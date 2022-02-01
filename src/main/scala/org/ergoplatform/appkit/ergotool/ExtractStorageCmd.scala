@@ -48,10 +48,10 @@ case class ExtractStorageCmd(
         console.println(secretStr)
       case PropSecretKey =>
         val sk  = Base16.encode(secret.keyBytes)
-        assert(sk == secret.key.w.toString(16), "inconsistent secret")
+        assert(sk == secret.privateInput.w.toString(16), "inconsistent secret")
         console.println(sk)
       case PropPublicKey =>
-        val pk = Base16.encode(secret.key.publicImage.pkBytes)
+        val pk = Base16.encode(secret.publicImage.pkBytes)
         console.println(pk)
       case _ =>
         sys.error(s"Invalid property requested: $prop")
